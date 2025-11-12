@@ -1,0 +1,5 @@
+// Estos 60 productos deben ser agregados antes del cierre del array en ProductListScreen.tsx línea 1051
+
+  // Calzado de Marcas y Diseñadores Premium (IDs 501-560)
+  { id: 501, name: 'Nike Air Jordan 1 Retro', price: 4999, category: 'calzado', image: 'https://images.unsplash.com/photo-1723797935115-92b666c26e14?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxuaWtlJTIwYWlyJTIwam9yZGFuJTIwc25lYWtlcnN8ZW58MXx8fHwxNzYyOTkwMzQxfDA&ixlib=rb-4.1.0&q=80&w=1080', description: 'Nike Air Jordan 1 Retro High. Diseño icónico de Michael Jordan. Cuero premium y amortiguación Air.', condition: 'Excelente', size: '27' },
+  { id: 502, name: 'Nike Dunk Low', price: 2999, category: 'calzado', image: 'https://images.unsplash.com/photo-1623684225794-a8f1f5037f5c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxuaWtlJTIwZHVuayUyMGxvd3xlbnwxfHx8fDE3NjI5OTAzNDF8MA&ixlib=rb-4.1.0&q=80&w=1080', description: 'Nike Dunk Low vintage basketball sneaker. Combinación clásica bicolor. Coleccionable streetwear.', condition: 'Semi nuevo', size: '26' },
