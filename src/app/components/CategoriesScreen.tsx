@@ -1,20 +1,36 @@
 import { useState, useEffect } from 'react';
-import { ShoppingCart } from 'lucide-react';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import type { Category } from '../App';
+import { Header } from './Header';
+import type { Category, User, Language } from '../App';
 import starLogo from 'figma:asset/93a8753ad858f757b1413489ff0481f51289e4a5.png';
 
 interface CategoriesScreenProps {
   onSelectCategory: (category: Category) => void;
   onGoToCart: () => void;
+  onGoToSupport: () => void;
+  onGoToCategories: () => void;
   cartItemsCount: number;
+  user: User;
+  onLogout: () => void;
+  language: Language;
+  onToggleLanguage: () => void;
 }
 
-export function CategoriesScreen({ onSelectCategory, onGoToCart, cartItemsCount }: CategoriesScreenProps) {
+export function CategoriesScreen({ 
+  onSelectCategory, 
+  onGoToCart, 
+  onGoToSupport,
+  onGoToCategories,
+  cartItemsCount,
+  user,
+  onLogout,
+  language,
+  onToggleLanguage
+}: CategoriesScreenProps) {
   const [hoveredCategory, setHoveredCategory] = useState<Category | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showEcoModal, setShowEcoModal] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
 
   // Imágenes de fondo por defecto (cuando no hay hover)
   const defaultBackgrounds = [
@@ -43,24 +59,51 @@ export function CategoriesScreen({ onSelectCategory, onGoToCart, cartItemsCount 
     ]
   };
 
+  const texts = {
+    en: {
+      exploreTitle: 'Explore by category',
+      exploreSubtitle: 'Find pre-owned items in excellent condition',
+      clothing: { name: 'Clothing', description: 'Discover unique pieces' },
+      accessories: { name: 'Accessories', description: 'Complete your style' },
+      footwear: { name: 'Footwear', description: 'Take the perfect step' },
+      whyBuy: 'Why buy pre-owned?',
+      sustainable: 'Sustainable and eco-friendly',
+      save: 'Save up to 70%',
+      unique: 'Unique and exclusive pieces'
+    },
+    es: {
+      exploreTitle: 'Explora por categoría',
+      exploreSubtitle: 'Encuentra artículos de segunda mano en excelente estado',
+      clothing: { name: 'Ropa', description: 'Descubre piezas únicas' },
+      accessories: { name: 'Accesorios', description: 'Completa tu estilo' },
+      footwear: { name: 'Calzado', description: 'Da el paso perfecto' },
+      whyBuy: '¿Por qué comprar de segunda mano?',
+      sustainable: 'Sostenible y ecológico',
+      save: 'Ahorra hasta 70%',
+      unique: 'Piezas únicas y exclusivas'
+    }
+  };
+
+  const t = texts[language];
+
   const categories = [
     {
       id: 'ropa' as Category,
-      name: 'Ropa',
+      name: t.clothing.name,
       image: 'https://images.unsplash.com/photo-1762343287001-b5c8ed1bf773?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2RlbCUyMHdlYXJpbmclMjBzbmVha2Vyc3xlbnwxfHx8fDE3NjI5NjQ4MjN8MA&ixlib=rb-4.1.0&q=80&w=1080',
-      description: 'Descubre prendas únicas',
+      description: t.clothing.description,
     },
     {
       id: 'accesorios' as Category,
-      name: 'Accesorios',
+      name: t.accessories.name,
       image: 'https://images.unsplash.com/photo-1721917113611-33f71aa9f416?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2RlbCUyMHdlYXJpbmclMjB3YXRjaHxlbnwxfHx8fDE3NjI5NjQ4MjJ8MA&ixlib=rb-4.1.0&q=80&w=1080',
-      description: 'Complementa tu estilo',
+      description: t.accessories.description,
     },
     {
       id: 'calzado' as Category,
-      name: 'Calzado',
+      name: t.footwear.name,
       image: 'https://images.unsplash.com/photo-1631363320585-06e91d54210e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYXNoaW9uJTIwbW9kZWwlMjBjbG90aGluZ3xlbnwxfHx8fDE3NjI5MjYwNjF8MA&ixlib=rb-4.1.0&q=80&w=1080',
-      description: 'Da el paso perfecto',
+      description: t.footwear.description,
     },
   ];
 
@@ -88,7 +131,12 @@ export function CategoriesScreen({ onSelectCategory, onGoToCart, cartItemsCount 
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-orange-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-100 relative overflow-hidden">
+      {/* Efectos de difuminación amarillos animados */}
+      <div className="absolute top-20 right-10 w-96 h-96 bg-yellow-400/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-20 left-10 w-96 h-96 bg-orange-400/15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+      <div className="absolute top-1/2 left-1/3 w-80 h-80 bg-amber-300/10 rounded-full blur-3xl animate-glow-yellow-pulse"></div>
+      
       {/* Logo de fondo difuminado y animado */}
       <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
         <img 
@@ -123,47 +171,26 @@ export function CategoriesScreen({ onSelectCategory, onGoToCart, cartItemsCount 
         </div>
       ))}
 
-      {/* Efectos de difuminación de fondo con múltiples colores - más animados */}
-      <div className="absolute top-20 right-10 w-80 h-80 bg-primary/15 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-40 left-10 w-72 h-72 bg-orange-400/10 rounded-full blur-3xl"></div>
-      <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-slate-800/5 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-20 right-1/3 w-56 h-56 bg-yellow-500/10 rounded-full blur-3xl"></div>
-      
       {/* Header con animación */}
-      <div className="bg-white/90 backdrop-blur-xl shadow-lg sticky top-0 z-10 border-b-2 border-primary/30 transition-all duration-300 hover:border-primary/50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3 group">
-            <img 
-              src={starLogo} 
-              alt="STAR Logo" 
-              className="w-10 h-10 object-contain rounded-full bg-white shadow-lg group-hover:scale-110 transition-transform duration-300 group-hover:rotate-12" 
-            />
-            <h1 className="text-gray-900 group-hover:text-primary transition-colors duration-300">Reseller STAR</h1>
-          </div>
-          <Button
-            variant="outline"
-            size="icon"
-            className="relative border-primary/30 hover:bg-yellow-50 hover:border-primary transition-all duration-300 hover:scale-110 hover:shadow-lg"
-            onClick={onGoToCart}
-          >
-            <ShoppingCart className="w-5 h-5" />
-            {cartItemsCount > 0 && (
-              <Badge className="absolute -top-2 -right-2 bg-primary text-black h-5 w-5 flex items-center justify-center p-0 border border-black animate-bounce">
-                {cartItemsCount}
-              </Badge>
-            )}
-          </Button>
-        </div>
-      </div>
+      <Header
+        user={user}
+        cartItemsCount={cartItemsCount}
+        onGoToCart={onGoToCart}
+        onGoToSupport={onGoToSupport}
+        onGoToCategories={onGoToCategories}
+        onLogout={onLogout}
+        language={language}
+        onToggleLanguage={onToggleLanguage}
+      />
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 py-8 relative z-10">
         <div className="mb-8 animate-fade-in">
           <h2 className="text-white mb-2 transition-all duration-300 drop-shadow-lg">
-            Explora por categoría
+            {t.exploreTitle}
           </h2>
           <p className="text-white/90 transition-all duration-300 drop-shadow-md">
-            Encuentra artículos de segunda mano en excelente estado
+            {t.exploreSubtitle}
           </p>
         </div>
 
@@ -176,11 +203,12 @@ export function CategoriesScreen({ onSelectCategory, onGoToCart, cartItemsCount 
                 onClick={() => onSelectCategory(category.id)}
                 onMouseEnter={() => setHoveredCategory(category.id)}
                 onMouseLeave={() => setHoveredCategory(null)}
-                className={`group relative overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 animate-float-subtle ${
+                className={`group relative overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 animate-slide-up-fade-in ${
                   isHovered ? 'ring-4 ring-primary z-10' : ''
                 }`}
                 style={{
-                  animationDelay: `${idx * 0.3}s`
+                  animationDelay: `${idx * 0.15}s`,
+                  opacity: 0
                 }}
               >
                 <div className="relative h-80">
@@ -236,7 +264,7 @@ export function CategoriesScreen({ onSelectCategory, onGoToCart, cartItemsCount 
           hoveredCategory ? 'bg-white/30 border-white/50' : 'bg-white/90 border-primary/30'
         }`}>
           <h3 className={`text-gray-900 mb-6 transition-colors duration-300 ${hoveredCategory ? 'text-white' : ''}`}>
-            ¿Por qué comprar de segunda mano?
+            {t.whyBuy}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className={`text-center p-6 rounded-xl transition-all duration-300 ${
@@ -244,7 +272,7 @@ export function CategoriesScreen({ onSelectCategory, onGoToCart, cartItemsCount 
             } shadow-md hover:shadow-xl cursor-pointer`}>
               <div className="text-5xl mb-3">♻️</div>
               <p className={`text-gray-600 transition-colors duration-300 ${hoveredCategory ? 'text-white/90' : ''}`}>
-                Sostenible y ecológico
+                {t.sustainable}
               </p>
             </div>
             <div className={`text-center p-6 rounded-xl transition-all duration-300 ${
@@ -252,7 +280,7 @@ export function CategoriesScreen({ onSelectCategory, onGoToCart, cartItemsCount 
             } shadow-md hover:shadow-xl cursor-pointer`}>
               <div className="text-5xl mb-3">💰</div>
               <p className={`text-gray-600 transition-colors duration-300 ${hoveredCategory ? 'text-white/90' : ''}`}>
-                Ahorra hasta un 70%
+                {t.save}
               </p>
             </div>
             <div className={`text-center p-6 rounded-xl transition-all duration-300 ${
@@ -260,7 +288,7 @@ export function CategoriesScreen({ onSelectCategory, onGoToCart, cartItemsCount 
             } shadow-md hover:shadow-xl cursor-pointer`}>
               <div className="text-5xl mb-3">✨</div>
               <p className={`text-gray-600 transition-colors duration-300 ${hoveredCategory ? 'text-white/90' : ''}`}>
-                Piezas únicas y exclusivas
+                {t.unique}
               </p>
             </div>
           </div>

@@ -2,7 +2,9 @@ import { ArrowLeft, ShoppingCart } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import type { Category, Product } from '../App';
+import { Header } from './Header';
+import type { Category, Product, User, Language } from '../App';
+import { productDescriptions } from '../translations/productTranslations';
 import nikeAirMaxImg from 'figma:asset/76e204c38dae800b0bbd2301e8e4893b6ea956ce.png';
 import pumaVogueImg from 'figma:asset/a9b202ca3655e552814b321e110fb8e570267a1a.png';
 import kswissImg from 'figma:asset/98ff7b2675ef3efa3682a7cd2d76e8e58c12487a.png';
@@ -13,7 +15,13 @@ interface ProductListScreenProps {
   onSelectProduct: (product: Product) => void;
   onBack: () => void;
   onGoToCart: () => void;
+  onGoToSupport: () => void;
+  onGoToCategories: () => void;
   cartItemsCount: number;
+  user: User;
+  onLogout: () => void;
+  language: Language;
+  onToggleLanguage: () => void;
 }
 
 const products: Product[] = [
@@ -23,7 +31,7 @@ const products: Product[] = [
     name: 'Supreme Box Logo Hoodie',
     price: 8999,
     category: 'ropa',
-    image: 'https://images.unsplash.com/photo-1624421918912-298449130024?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzdXByZW1lJTIwaG9vZGllfGVufDF8fHx8MTc2Mjg3NjcwN3ww&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1550171511-f7a55d41fbc4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzdXByZW1lJTIwYm94JTIwbG9nbyUyMGhvb2RpZSUyMHJlZHxlbnwxfHx8fDE3NjUyMTk1Njh8MA&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Sudadera Supreme con logo box icónico. Edición limitada, 100% algodón premium.',
     condition: 'Como nuevo',
     size: 'L',
@@ -33,7 +41,7 @@ const products: Product[] = [
     name: 'Gucci Leather Jacket',
     price: 18500,
     category: 'ropa',
-    image: 'https://images.unsplash.com/photo-1551283279-166ab6d719af?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsZWF0aGVyJTIwamFja2V0JTIwbHV4dXJ5fGVufDF8fHx8MTc2Mjk2MDkzOXww&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1604850078305-58cd6424c55e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxndWNjaSUyMGxlYXRoZXIlMjBqYWNrZXQlMjBibGFjayUyMGx1eHVyeXxlbnwxfHx8fDE3NjUyMTk1Njh8MA&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Chamarra de cuero genuino Gucci con herrajes dorados y forro de seda.',
     condition: 'Excelente',
     size: 'M',
@@ -43,7 +51,7 @@ const products: Product[] = [
     name: 'Levi\'s 501 Original Jeans',
     price: 1299,
     category: 'ropa',
-    image: 'https://images.unsplash.com/photo-1762025396099-c46130d47ab6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkZXNpZ25lciUyMGplYW5zJTIwZGVuaW18ZW58MXx8fHwxNzYyOTYwOTM5fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1727777840115-e173c91444e4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsZXZpcyUyMDUwMSUyMGplYW5zJTIwYmx1ZSUyMGRlbmltfGVufDF8fHx8MTc2NTIxOTU2OXww&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Jeans clásicos Levi\'s 501 en mezclilla de algodón 100%. Corte recto original.',
     condition: 'Buen estado',
     size: '32',
@@ -53,7 +61,7 @@ const products: Product[] = [
     name: 'Nike Tech Fleece Joggers',
     price: 1899,
     category: 'ropa',
-    image: 'https://images.unsplash.com/photo-1597767938316-e3b197db76ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxuaWtlJTIwdGVjaCUyMGZsZWVjZXxlbnwxfHx8fDE3NjI5NjA5Mzl8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1762575910569-46971cd69df3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxuaWtlJTIwdGVjaCUyMGZsZWVjZSUyMGpvZ2dlcnMlMjBibGFja3xlbnwxfHx8fDE3NjUyMTk1Njl8MA&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Pantalones Nike Tech Fleece, material ligero y térmico. Perfectos para cualquier ocasión.',
     condition: 'Como nuevo',
     size: 'L',
@@ -63,7 +71,7 @@ const products: Product[] = [
     name: 'Adidas Firebird Track Jacket',
     price: 1599,
     category: 'ropa',
-    image: 'https://images.unsplash.com/photo-1586360727847-108cbb274ad1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhZGlkYXMlMjB0cmFjayUyMGphY2tldHxlbnwxfHx8fDE3NjI5NjA5NDB8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1715609104156-c4d6a3ac8638?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhZGlkYXMlMjBmaXJlYmlyZCUyMHRyYWNrJTIwamFja2V0fGVufDF8fHx8MTc2NTIxOTU3MHww&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Chamarra Adidas Firebird clásica con las icónicas tres rayas. Poliéster de alta calidad.',
     condition: 'Excelente',
     size: 'M',
@@ -73,7 +81,7 @@ const products: Product[] = [
     name: 'Gucci Cotton T-Shirt',
     price: 4500,
     category: 'ropa',
-    image: 'https://images.unsplash.com/photo-1649439081580-c871799f19b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxndWNjaSUyMHNoaXJ0fGVufDF8fHx8MTc2Mjk2MDk0MHww&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1756277242553-147261b654d5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxndWNjaSUyMGRlc2lnbmVyJTIwdHNoaXJ0JTIwd2hpdGV8ZW58MXx8fHwxNzY1MjE5NTcwfDA&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Playera Gucci de algodón premium con logo bordado. Diseño minimalista y elegante.',
     condition: 'Como nuevo',
     size: 'M',
@@ -93,7 +101,7 @@ const products: Product[] = [
     name: 'Off-White Bomber Jacket',
     price: 12999,
     category: 'ropa',
-    image: 'https://images.unsplash.com/photo-1760126070359-5b82710274fe?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxib21iZXIlMjBqYWNrZXQlMjBzdHJlZXR3ZWFyfGVufDF8fHx8MTc2Mjk1ODYwMHww&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1562009578-0eb8ea8a26ce?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvZmZ3aGl0ZSUyMGJvbWJlciUyMGphY2tldCUyMHN0cmVldHdlYXJ8ZW58MXx8fHwxNzY1MjE5NTcxfDA&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Bomber Off-White con detalles característicos de la marca. Streetwear de alta gama.',
     condition: 'Excelente',
     size: 'M',
@@ -103,7 +111,7 @@ const products: Product[] = [
     name: 'Carhartt Cargo Pants',
     price: 1499,
     category: 'ropa',
-    image: 'https://images.unsplash.com/photo-1649114393978-42dfcdb0c313?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYXJnbyUyMHBhbnRzJTIwc3RyZWV0d2VhcnxlbnwxfHx8fDE3NjI5MzY0NDV8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1734888765930-ce5ed0daa214?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYXJoYXJ0dCUyMGNhcmdvJTIwcGFudHMlMjB3b3Jrd2VhcnxlbnwxfHx8fDE3NjUyMTk1NzF8MA&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Pantalones cargo Carhartt de trabajo resistente. Múltiples bolsillos y tela durable.',
     condition: 'Buen estado',
     size: '34',
@@ -113,7 +121,7 @@ const products: Product[] = [
     name: 'Vintage Band T-Shirt',
     price: 699,
     category: 'ropa',
-    image: 'https://images.unsplash.com/photo-1565609339309-10c53fbe68ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2aW50YWdlJTIwYmFuZCUyMHRzaGlydHxlbnwxfHx8fDE3NjI5NTcxMzJ8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1594700774924-32ebd969fc6a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2aW50YWdlJTIwYmFuZCUyMHRzaGlydCUyMGNvbmNlcnR8ZW58MXx8fHwxNzY1MjE5NTcyfDA&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Playera vintage de banda de rock. Algodón suave con gráficos desgastados auténticos.',
     condition: 'Buen estado',
     size: 'M',
@@ -123,7 +131,7 @@ const products: Product[] = [
     name: 'The North Face Puffer Jacket',
     price: 3499,
     category: 'ropa',
-    image: 'https://images.unsplash.com/photo-1713448721104-ecdcd999f341?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwdWZmZXIlMjBqYWNrZXQlMjBub3J0aCUyMGZhY2V8ZW58MXx8fHwxNzYyOTYwOTQyfDA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1616196334449-5975c84e753b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxub3J0aCUyMGZhY2UlMjBwdWZmZXIlMjBqYWNrZXQlMjB3aW50ZXJ8ZW58MXx8fHwxNzY1MjE5NTcyfDA&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Chamarra acolchada The North Face con relleno de plumas. Abriga perfectamente en invierno.',
     condition: 'Como nuevo',
     size: 'L',
@@ -133,7 +141,7 @@ const products: Product[] = [
     name: 'Champion Reverse Weave Hoodie',
     price: 1299,
     category: 'ropa',
-    image: 'https://images.unsplash.com/photo-1626610761515-b6b224c8399d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjaGFtcGlvbiUyMHN3ZWF0c2hpcnR8ZW58MXx8fHwxNzYyOTYwOTQyfDA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1600269453258-30a2e10c72f3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjaGFtcGlvbiUyMHJldmVyc2UlMjB3ZWF2ZSUyMGhvb2RpZXxlbnwxfHx8fDE3NjUyMTk1NzJ8MA&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Sudadera Champion Reverse Weave de tejido premium. Logo bordado característico.',
     condition: 'Excelente',
     size: 'XL',
@@ -143,7 +151,7 @@ const products: Product[] = [
     name: 'Hugo Boss Dress Pants',
     price: 1899,
     category: 'ropa',
-    image: 'https://images.unsplash.com/photo-1760545183001-af3b64500b0d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkcmVzcyUyMHBhbnRzJTIwZm9ybWFsfGVufDF8fHx8MTc2MjkzMTkxNHww&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1570882280426-df8ac5ccd672?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxodWdvJTIwYm9zcyUyMGRyZXNzJTIwcGFudHMlMjBmb3JtYWx8ZW58MXx8fHwxNzY1MjE5NTcyfDA&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Pantalones de vestir Hugo Boss en lana premium. Corte slim fit moderno.',
     condition: 'Como nuevo',
     size: '32',
@@ -153,7 +161,7 @@ const products: Product[] = [
     name: 'Patagonia Flannel Shirt',
     price: 1199,
     category: 'ropa',
-    image: 'https://images.unsplash.com/photo-1658710761111-f8cfb5c370c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmbGFubmVsJTIwc2hpcnQlMjBwbGFpZHxlbnwxfHx8fDE3NjI4Njg2NzJ8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1748451527665-d25a73ac10d9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwYXRhZ29uaWElMjBmbGFubmVsJTIwc2hpcnQlMjBwbGFpZHxlbnwxfHx8fDE3NjUyMTk1NzN8MA&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Camisa de franela Patagonia a cuadros. Algodón orgánico cálido y cómodo.',
     condition: 'Excelente',
     size: 'M',
@@ -163,7 +171,7 @@ const products: Product[] = [
     name: 'Levi\'s Trucker Jacket',
     price: 1599,
     category: 'ropa',
-    image: 'https://images.unsplash.com/photo-1556041068-5874261f23e5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkZW5pbSUyMGphY2tldCUyMHZpbnRhZ2V8ZW58MXx8fHwxNzYyOTUxMDY5fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1635715226585-004fef5a55a4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsZXZpcyUyMHRydWNrZXIlMjBqYWNrZXQlMjBkZW5pbXxlbnwxfHx8fDE3NjUyMTk1NzN8MA&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Chamarra de mezclilla Levi\'s Trucker clásica. Icónica y versátil para todo clima.',
     condition: 'Buen estado',
     size: 'L',
@@ -173,7 +181,7 @@ const products: Product[] = [
     name: 'Adidas Tiro Joggers',
     price: 899,
     category: 'ropa',
-    image: 'https://images.unsplash.com/photo-1597586740347-a5a9d9a93e85?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxqb2dnZXIlMjBwYW50cyUyMGF0aGxldGljfGVufDF8fHx8MTc2Mjk2MDk0NHww&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1589178698744-b0c65639636e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhZGlkYXMlMjB0aXJvJTIwdHJhY2slMjBwYW50c3xlbnwxfHx8fDE3NjUyMTk1ODN8MA&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Pantalones deportivos Adidas Tiro con las tres rayas. Material transpirable.',
     condition: 'Como nuevo',
     size: 'M',
@@ -183,7 +191,7 @@ const products: Product[] = [
     name: 'Nike Windrunner Jacket',
     price: 1699,
     category: 'ropa',
-    image: 'https://images.unsplash.com/photo-1548126032-079a0fb0099d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3aW5kYnJlYWtlciUyMGphY2tldHxlbnwxfHx8fDE3NjI4OTExODN8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1715609104589-97585b210c6e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxuaWtlJTIwd2luZHJ1bm5lciUyMGphY2tldCUyMGNoZXZyb258ZW58MXx8fHwxNzY1MjE5NTgzfDA&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Rompevientos Nike Windrunner con diseño chevron icónico. Ligero e impermeable.',
     condition: 'Excelente',
     size: 'L',
@@ -363,7 +371,7 @@ const products: Product[] = [
     name: 'Rolex Submariner',
     price: 189999,
     category: 'accesorios',
-    image: 'https://images.unsplash.com/photo-1702865053958-71ec751c4118?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyb2xleCUyMHdhdGNoJTIwbHV4dXJ5fGVufDF8fHx8MTc2Mjg4MTUyOHww&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1670404160620-a3a86428560e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyb2xleCUyMHN1Ym1hcmluZXIlMjBsdXh1cnklMjB3YXRjaHxlbnwxfHx8fDE3NjUyMTk1ODN8MA&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Reloj Rolex Submariner, el legendario reloj de buceo. Acero inoxidable 904L con movimiento automático. Resistente al agua hasta 300m.',
     condition: 'Excelente',
     size: 'Único',
@@ -413,7 +421,7 @@ const products: Product[] = [
     name: 'Gucci Leather Belt',
     price: 5999,
     category: 'accesorios',
-    image: 'https://images.unsplash.com/photo-1664286074240-d7059e004dff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkZXNpZ25lciUyMGJlbHQlMjBsZWF0aGVyfGVufDF8fHx8MTc2Mjk2NDIyMXww&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1645276266921-73416ef97dd7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxndWNjaSUyMGxlYXRoZXIlMjBiZWx0JTIwZ29sZHxlbnwxfHx8fDE3NjUyMTk1ODV8MA&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Cinturón Gucci de cuero con hebilla GG dorada. Cuero italiano de primera calidad.',
     condition: 'Como nuevo',
     size: '85',
@@ -734,7 +742,7 @@ const products: Product[] = [
     name: 'Converse Chuck Taylor All Star',
     price: 1299,
     category: 'calzado',
-    image: 'https://images.unsplash.com/photo-1562105962-2fbaaf107fe3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb252ZXJzZSUyMHNob2VzfGVufDF8fHx8MTc2Mjk2MDEyOHww&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1664190052920-1a4f05f9243b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb252ZXJzZSUyMGNodWNrJTIwdGF5bG9yJTIwc25lYWtlcnN8ZW58MXx8fHwxNzY1MjE5NTg2fDA&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Tenis Converse Chuck Taylor All Star, el clásico que nunca pasa de moda. Diseño de caña alta en lona resistente. Perfectos para cualquier ocasión casual.',
     condition: 'Buen estado',
     size: '25',
@@ -744,7 +752,7 @@ const products: Product[] = [
     name: 'Vans Old Skool',
     price: 1499,
     category: 'calzado',
-    image: 'https://images.unsplash.com/photo-1731212160019-97609cbceb45?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2YW5zJTIwc25lYWtlcnN8ZW58MXx8fHwxNzYyOTYwMTI4fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1620237468009-9bbd18f2de23?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2YW5zJTIwb2xkJTIwc2tvb2wlMjBzaG9lc3xlbnwxfHx8fDE3NjUyMTk1ODZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Tenis Vans Old Skool, el icónico diseño skate con la franja lateral característica. Construcción duradera en lona y ante. Suela waffle para mejor agarre.',
     condition: 'Como nuevo',
     size: '27',
@@ -774,7 +782,7 @@ const products: Product[] = [
     name: 'Air Jordan 1 Retro',
     price: 4299,
     category: 'calzado',
-    image: 'https://images.unsplash.com/photo-1684918652908-8c5b4a154781?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxqb3JkYW4lMjBzbmVha2Vyc3xlbnwxfHx8fDE3NjI5NjAxMjl8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1723797935115-92b666c26e14?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxuaWtlJTIwYWlyJTIwam9yZGFuJTIwc25lYWtlcnN8ZW58MXx8fHwxNzY1MjE5NTg1fDA&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Tenis Air Jordan 1 Retro, el legendario diseño que revolucionó el basketball. Cuero premium con diseño de caña alta. Una pieza de colección imprescindible.',
     condition: 'Como nuevo',
     size: '27',
@@ -1072,47 +1080,52 @@ const products: Product[] = [
 ];
 
 const categoryNames = {
-  ropa: 'Ropa',
-  accesorios: 'Accesorios',
-  calzado: 'Calzado',
+  ropa: 'Clothing',
+  accesorios: 'Accessories',
+  calzado: 'Footwear',
 };
 
-// Normalizar nombres de condiciones a: Excelente, Semi nuevo, Bueno
+// Normalize condition names to: Excellent, Like new, Good
 const normalizeCondition = (condition: string): string => {
   const normalized = condition.toLowerCase();
-  if (normalized.includes('como nuevo') || normalized.includes('seminuevo') || normalized.includes('semi nuevo')) {
-    return 'Semi nuevo';
+  if (normalized.includes('como nuevo') || normalized.includes('seminuevo') || normalized.includes('semi nuevo') || normalized.includes('like new')) {
+    return 'Like new';
   }
-  if (normalized.includes('buen') || normalized.includes('bueno')) {
-    return 'Bueno';
+  if (normalized.includes('buen') || normalized.includes('bueno') || normalized.includes('good')) {
+    return 'Good';
   }
-  if (normalized.includes('usado')) {
-    return 'Usado';
+  if (normalized.includes('usado') || normalized.includes('used')) {
+    return 'Used';
   }
-  return 'Excelente';
+  return 'Excellent';
 };
 
-// Calcular descuento basado en el estado
+// Calculate discount percentage
 const getDiscountPercentage = (condition: string): number => {
-  const normalized = normalizeCondition(condition);
-  switch (normalized) {
-    case 'Excelente':
-      return 40;
-    case 'Semi nuevo':
-      return 50;
-    case 'Bueno':
-      return 60;
-    case 'Usado':
-      return 70;
-    default:
-      return 40;
+  const conditionLower = condition.toLowerCase();
+  if (conditionLower.includes('como nuevo') || conditionLower.includes('like new')) {
+    return 50;
   }
+  if (conditionLower.includes('buen') || conditionLower.includes('good')) {
+    return 60;
+  }
+  // Excellent/Excelente or default
+  return 40;
 };
 
-// Calcular precio con descuento
+// Calculate discounted price from original price
 const getDiscountedPrice = (originalPrice: number, condition: string): number => {
   const discount = getDiscountPercentage(condition);
   return Math.round(originalPrice * (1 - discount / 100));
+};
+
+// Helper function to get translated description
+const getTranslatedDescription = (product: Product, language: Language): string => {
+  const translation = productDescriptions[product.id];
+  if (translation) {
+    return language === 'en' ? translation.en : translation.es;
+  }
+  return product.description; // Fallback to original description
 };
 
 export function ProductListScreen({
@@ -1120,9 +1133,30 @@ export function ProductListScreen({
   onSelectProduct,
   onBack,
   onGoToCart,
+  onGoToSupport,
+  onGoToCategories,
   cartItemsCount,
+  user,
+  onLogout,
+  language,
+  onToggleLanguage,
 }: ProductListScreenProps) {
   const filteredProducts = products.filter(p => p.category === category);
+
+  const texts = {
+    en: {
+      itemsAvailable: 'items available in',
+      size: 'Size',
+      condition: 'Condition'
+    },
+    es: {
+      itemsAvailable: 'artículos disponibles en',
+      size: 'Talla',
+      condition: 'Estado'
+    }
+  };
+
+  const t = texts[language];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-100 via-yellow-50 to-rose-50 relative overflow-hidden">
@@ -1133,36 +1167,25 @@ export function ProductListScreen({
       <div className="absolute bottom-40 right-1/4 w-64 h-64 bg-gradient-to-bl from-orange-300/20 to-primary/15 rounded-full blur-3xl"></div>
       <div className="absolute top-1/4 right-1/3 w-56 h-56 bg-gradient-to-tr from-yellow-200/15 to-amber-300/10 rounded-full blur-3xl"></div>
       
-      {/* Header con animaciones sutiles */}
-      <div className="bg-gradient-to-r from-white/95 via-yellow-50/90 to-white/95 backdrop-blur-xl shadow-lg sticky top-0 z-10 border-b-2 border-primary/40 transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4 group">
-            <Button variant="ghost" size="icon" onClick={onBack} className="hover:bg-yellow-50 transition-all duration-300 hover:scale-105">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <img src={starLogo} alt="STAR Logo" className="w-8 h-8 object-contain rounded-full bg-white shadow-lg group-hover:scale-110 transition-transform duration-300" />
-            <h1 className="text-gray-900 group-hover:text-primary transition-colors duration-300">{categoryNames[category]}</h1>
-          </div>
-          <Button
-            variant="outline"
-            size="icon"
-            className="relative border-primary/30 hover:bg-yellow-50 hover:border-primary transition-all duration-300 hover:scale-105 hover:shadow-md"
-            onClick={onGoToCart}
-          >
-            <ShoppingCart className="w-5 h-5" />
-            {cartItemsCount > 0 && (
-              <Badge className="absolute -top-2 -right-2 bg-primary text-black h-5 w-5 flex items-center justify-center p-0 border border-black animate-bounce">
-                {cartItemsCount}
-              </Badge>
-            )}
-          </Button>
-        </div>
-      </div>
+      {/* Header */}
+      <Header
+        user={user}
+        cartItemsCount={cartItemsCount}
+        onGoToCart={onGoToCart}
+        onGoToSupport={onGoToSupport}
+        onGoToCategories={onGoToCategories}
+        onLogout={onLogout}
+        language={language}
+        onToggleLanguage={onToggleLanguage}
+        showBackButton={true}
+        onBack={onBack}
+        title={categoryNames[category]}
+      />
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 py-8 relative z-10">
         <div className="mb-6 bg-gradient-to-r from-primary/10 via-yellow-100/50 to-orange-100/50 backdrop-blur-sm rounded-xl p-4 border border-primary/20 animate-fade-in">
-          <p className="text-gray-900">{filteredProducts.length} artículos disponibles en <span className="text-primary font-medium">{categoryNames[category]}</span></p>
+          <p className="text-gray-900">{filteredProducts.length} {t.itemsAvailable} <span className="text-primary font-medium">{categoryNames[category]}</span></p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -1198,18 +1221,18 @@ export function ProductListScreen({
                 <h3 className="text-gray-900 mb-2 group-hover:text-primary transition-colors duration-300 line-clamp-2">{product.name}</h3>
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex flex-col gap-1">
-                    <span className="text-gray-400 text-xs line-through">${product.price}</span>
+                    <span className="text-gray-400 text-xs line-through">${product.price.toFixed(2)}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-black font-medium group-hover:scale-105 transition-transform duration-300 text-lg">${getDiscountedPrice(product.price, product.condition)}</span>
+                      <span className="text-black font-medium group-hover:scale-105 transition-transform duration-300 text-lg">${getDiscountedPrice(product.price, product.condition).toFixed(2)}</span>
                       <span className="text-xs bg-gradient-to-r from-red-500 to-orange-500 text-white px-2 py-0.5 rounded-full font-medium">-{getDiscountPercentage(product.condition)}%</span>
                     </div>
                   </div>
                   <span className="text-gray-700 bg-gradient-to-r from-yellow-100 to-orange-100 px-2 py-1 rounded group-hover:from-primary group-hover:to-yellow-300 group-hover:text-black transition-all duration-300 text-xs">
-                    Talla {product.size}
+                    {t.size} {product.size}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-gray-500 text-xs">Estado:</span>
+                  <span className="text-gray-500 text-xs">{t.condition}:</span>
                   <span className="text-gray-900 text-xs font-medium">{normalizeCondition(product.condition)}</span>
                 </div>
               </div>
